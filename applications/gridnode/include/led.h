@@ -1,5 +1,5 @@
-#ifndef __LED__H__
-#define __LED__H__
+#ifndef __GRIDNODE_LED__H__
+#define __GRIDNODE_LED__H__
 
 // For LED
 #include <device.h>
@@ -15,4 +15,4 @@
 void leds_init();
 void leds_write(uint8_t mask, uint8_t value);
 
-#endif /* __LED__H__ */
+#endif /* __GRIDNODE_LED__H__ */
