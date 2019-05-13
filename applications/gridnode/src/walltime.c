@@ -3,7 +3,7 @@
 static struct sntp_ctx ctx;
 static struct sockaddr_in ntp_addr;
 
-int sntp_client_init(){
+int walltime_init(){
     u64_t epoch_time;
     int rv;
 
@@ -28,11 +28,10 @@ int sntp_client_init(){
         printk("Failed to send sntp request: %d", rv);
         return -1;
     }
-    printk("time: %lld\n", epoch_time);
+    printk("SNTP time: %llx\n", epoch_time);
     printk("status: %d\n", rv);
 
     sntp_close(&ctx);
-    while(1){
-        k_sleep(K_MSEC(1000));
-    };
+    
+    return 0;
 }

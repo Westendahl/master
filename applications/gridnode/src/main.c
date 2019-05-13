@@ -14,6 +14,8 @@
 #include <net/socket.h>
 #include <lte_lc.h>
 
+#include "sntp_raw.h"
+#include "walltime.h"
 #include "led.h"
 #include "controller.h"
 
@@ -399,6 +401,8 @@ void main(void)
 	// if (err) {
 	//	printk("ERROR_LTE_LC trying PSM %d\n", err);
 	// }
+
+	walltime_init();
 
 	k_timer_start(&periodic_id, K_MSEC(1500), K_MSEC(1500));
 	k_poll_signal_raise(&mqtt_ready_signal, 0);

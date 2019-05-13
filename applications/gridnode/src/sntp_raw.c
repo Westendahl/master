@@ -8,7 +8,7 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(net_sntp, CONFIG_SNTP_LOG_LEVEL);
 
-#include <net/sntp.h>
+#include "sntp_raw.h"
 #include "sntp_pkt.h"
 
 #define SNTP_LI_MAX 3
@@ -48,6 +48,7 @@ static s32_t parse_response(u8_t *data, u16_t len, u32_t orig_ts,
 {
 	struct sntp_pkt *pkt = (struct sntp_pkt *)data;
 	u32_t ts;
+	u32_t tf;
 
 	sntp_pkt_dump(pkt);
 
@@ -81,7 +82,7 @@ static s32_t parse_response(u8_t *data, u16_t len, u32_t orig_ts,
 	tf = ntohl(pkt->tx_tm_f);
 
 	// Combine tx seconds and fractions to a single timestamp
-	*sntp_time = ( (u64_t)( (ts) << 32) ) | (u64_t)(tf) )
+	*sntp_time = ( (u64_t)(ts) << 32 ) | (u64_t)(tf) ;
 
 	return 0;
 }
