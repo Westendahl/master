@@ -415,8 +415,10 @@ void main(void)
 		if (events[1].signal->signaled) {
 			events[1].signal->signaled = 0;
 			events[1].state = K_POLL_STATE_NOT_READY;
-
-			sprintf(payload_buf, "test %d", k_uptime_get_32());
+			uint64_t timestamp = 0;
+			uint64_t accuracy = 0;
+			err = walltime_get(&timestamp, &accuracy);
+			sprintf(payload_buf, "%lu %lu", timestamp>>32,accuracy>>10);
 			data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 				payload_buf, strlen(payload_buf));
 		}
