@@ -5,7 +5,9 @@ static struct sntp_ctx ctx;
 static struct sockaddr_in ntp_addr;
 
 static tinysync_est_state_t state;
+static tinysync_est_ret_t last_result;
 
+// Gets a tiny-sync datapoint by requesting time over SNTP
 int get_datapoint(tinysync_datapoint_t * datapoint){
     int rv;
 
@@ -42,25 +44,43 @@ int get_datapoint(tinysync_datapoint_t * datapoint){
     return 0;
 }
 
+int walltime_calibrate(){
+    tinysync_datapoint_t datapoint;
+    int err = get_datapoint(&datapoint);
+    if (err < 0) return -1;
+    last_result = tinysync_est_etimate(&state, &datapoint);
+    while(last_result != TINYSYNC_EST_OK){
+        k_sleep(K_MSEC(1000));
+        int err = get_datapoint(&datapoint);
+        if (err < 0) return -1;
+        last_result = tinysync_est_etimate(&state, &datapoint);
+        //uint64_t now = k_uptime_get();
+        //uint64_t max_t_2 = (uint64_t)((((double)now) - state.lineset.ba.b) / state.lineset.ba.a);
+        //uint64_t min_t_2 = (uint64_t)((((double)now) - state.lineset.ab.b) / state.lineset.ab.a);
+
+        //printk("T2EXP:%llx\n", (max_t_2/2) + (min_t_2/2) );
+        //printk("ACC (1024ths)(1sec):%lld\n", ((max_t_2/2) - (min_t_2/2)) >> 22 );
+        //printk("RESLT:%d\n",result);
+    }
+    return 0;
+}
+
+int walltime_get(uint64_t * t_expected, uint64_t * accuracy){
+    if (last_result != TINYSYNC_EST_OK) {
+        return -1;
+    }
+    uint64_t now = k_uptime_get();
+    uint64_t max_t_2 = (uint64_t)((((double)now) - state.lineset.ba.b) / state.lineset.ba.a);
+    uint64_t min_t_2 = (uint64_t)((((double)now) - state.lineset.ab.b) / state.lineset.ab.a);
+    *t_expected = (max_t_2/2) + (min_t_2/2);
+    *accuracy = (max_t_2/2) - (min_t_2/2);
+    return 0;
+}
+
 int walltime_init(){
     tinysync_est_state_t_initialize(&state);
-    tinysync_datapoint_t datapoint;
-    tinysync_est_ret_t result = TINYSYNC_EST_INVALID;
-    while(result != TINYSYNC_EST_OK){
-        int err = get_datapoint(&datapoint);
-        if (err < 0){
-            return -1;
-        }
-        result = tinysync_est_etimate(&state, &datapoint);
-        uint64_t now = k_uptime_get();
-        uint64_t max_t_2 = (uint64_t)((((double)now) - state.lineset.ba.b) / state.lineset.ba.a);
-        uint64_t min_t_2 = (uint64_t)((((double)now) - state.lineset.ab.b) / state.lineset.ab.a);
-
-        printk("T2MAX:%llx\n",max_t_2);
-        printk("T2MIN:%llx\n",min_t_2);
-        printk("RESLT:%d\n",result);
-        k_sleep(K_MSEC(1000));
-        
-    }
+    last_result = TINYSYNC_EST_INVALID;
+    int err = walltime_calibrate();
+    if (err < 0) return -1;
     return 0;
 }
