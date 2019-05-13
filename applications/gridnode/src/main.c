@@ -381,10 +381,10 @@ void main(void)
 		return;
 	}
 
+
+	// Signals waking up the event handler
 	k_poll_signal_init(&mqtt_event_signal);
 	k_poll_signal_init(&periodic_event_signal);
-
-	// Kernel signal init
 	struct k_poll_event events[2] = {
         K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
                                  K_POLL_MODE_NOTIFY_ONLY,
