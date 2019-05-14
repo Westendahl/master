@@ -54,13 +54,6 @@ int walltime_calibrate(){
         int err = get_datapoint(&datapoint);
         if (err < 0) return -1;
         last_result = tinysync_est_etimate(&state, &datapoint);
-        //uint64_t now = k_uptime_get();
-        //uint64_t max_t_2 = (uint64_t)((((double)now) - state.lineset.ba.b) / state.lineset.ba.a);
-        //uint64_t min_t_2 = (uint64_t)((((double)now) - state.lineset.ab.b) / state.lineset.ab.a);
-
-        //printk("T2EXP:%llx\n", (max_t_2/2) + (min_t_2/2) );
-        //printk("ACC (1024ths)(1sec):%lld\n", ((max_t_2/2) - (min_t_2/2)) >> 22 );
-        //printk("RESLT:%d\n",result);
     }
     return 0;
 }
@@ -74,6 +67,9 @@ int walltime_get(uint64_t * t_expected, uint64_t * accuracy){
     uint64_t min_t_2 = (uint64_t)((((double)now) - state.lineset.ab.b) / state.lineset.ab.a);
     *t_expected = (max_t_2/2) + (min_t_2/2);
     *accuracy = (max_t_2/2) - (min_t_2/2);
+    //printk("T2EXP:%llx\n", (max_t_2/2) + (min_t_2/2) );
+    //printk("ACC (1024ths)(1sec):%lld\n", ((max_t_2/2) - (min_t_2/2)) >> 22 );
+    //printk("RESLT:%d\n",result);
     return 0;
 }
 
