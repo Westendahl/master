@@ -18,6 +18,7 @@
 #include "walltime.h"
 #include "led.h"
 #include "controller.h"
+#include "sensor.h"
 
 /* Buffers for MQTT client. */
 static u8_t rx_buffer[CONFIG_MQTT_MESSAGE_BUFFER_SIZE];
@@ -415,10 +416,12 @@ void main(void)
 		if (events[1].signal->signaled) {
 			events[1].signal->signaled = 0;
 			events[1].state = K_POLL_STATE_NOT_READY;
-			uint64_t timestamp = 0;
-			uint64_t accuracy = 0;
-			err = walltime_get(&timestamp, &accuracy);
-			sprintf(payload_buf, "%lu %lu", timestamp>>32,accuracy>>10);
+			
+			err = sensor_build_payload(payload_buf);
+			if (err < 0) {
+				break;
+			}
+
 			data_publish(&client, MQTT_QOS_1_AT_LEAST_ONCE,
 				payload_buf, strlen(payload_buf));
 		}
@@ -429,7 +432,7 @@ void main(void)
 			events[0].state = K_POLL_STATE_NOT_READY;
 			err = events[0].signal->result;
 			if (err < 0) {
-				printk("ERROR: poll %d\n", errno);
+				printk("ERROR: poll %d\n", err);
 				break;
 			}
 
