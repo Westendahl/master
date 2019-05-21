@@ -16,9 +16,7 @@ int get_datapoint(tinysync_datapoint_t * datapoint){
 
     ntp_addr.sin_family = AF_INET;
     ntp_addr.sin_port = htons(123);
-    /* inet_pton(AF_INET, "129.240.2.6", // ntp.uio.no
-            &ntp_addr.sin_addr); */ // Bug: inet_pton does not seem to work
-    ntp_addr.sin_addr.s_addr = (u32_t) 0x0602f081; // "129.240.2.6" // ntp.uio.no
+    ntp_addr.sin_addr.s_addr = (u32_t) 0x0602f081; // "129.240.2.6" // ntp.uio.no, UIO's time server
 
     rv = sntp_init(&ctx, (struct sockaddr *) &ntp_addr,
                 sizeof(struct sockaddr_in));

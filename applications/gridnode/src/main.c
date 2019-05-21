@@ -397,12 +397,6 @@ void main(void)
                                  &periodic_event_signal),
     };
 
-	// Put modem in Power Saving Mode (no Rx except right after Tx)
-	// err = lte_lc_psm_req(true);
-	// if (err) {
-	//	printk("ERROR_LTE_LC trying PSM %d\n", err);
-	// }
-
 	walltime_init();
 
 	k_timer_start(&periodic_id, K_MSEC(1500), K_MSEC(1500));
