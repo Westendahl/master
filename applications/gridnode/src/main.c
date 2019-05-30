@@ -399,7 +399,7 @@ void main(void)
 
 	walltime_init();
 
-	k_timer_start(&periodic_id, K_MSEC(1500), K_MSEC(1500));
+	k_timer_start(&periodic_id, K_MSEC(2500), K_MSEC(2500));
 	k_poll_signal_raise(&mqtt_ready_signal, 0);
 	while (1) {
 		leds_write(0x1,0x1);
